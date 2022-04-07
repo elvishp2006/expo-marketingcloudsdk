@@ -1,1 +1,1 @@
-export { default as MCReactModule } from 'react-native-marketingcloudsdk';
+export { default as MCReactModule } from "react-native-marketingcloudsdk";
