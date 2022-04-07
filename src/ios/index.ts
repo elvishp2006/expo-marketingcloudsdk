@@ -19,13 +19,11 @@ export const withIOSConfig: ConfigPlugin<MarketingCloudSdkPluginProps> = (
   props
 ) => {
   config = withEntitlements(config, props);
-
   config = withExtraAppDelegateProtocols(config, props);
-
   config = withConfiguration(config, props);
-  config = withPushConfiguration(config, props);
-  config = withDelegateImplementation(config, props);
-  config = withMarketingCloudCocoaPods(config, props);
+  config = withPushConfiguration(config);
+  config = withDelegateImplementation(config);
+  config = withMarketingCloudCocoaPods(config);
 
   return config;
 };
@@ -36,6 +34,7 @@ const withEntitlements: ConfigPlugin<MarketingCloudSdkPluginProps> = (
 ) => {
   return withEntitlementsPlist(config, async (config) => {
     config.modResults["aps-environment"] = mode;
+
     return config;
   });
 };
@@ -101,7 +100,7 @@ const withConfiguration: ConfigPlugin<MarketingCloudSdkPluginProps> = (
     NSError *error = nil;
     BOOL success = [[MarketingCloudSDK sharedInstance] sfmc_configureWithDictionary:[mcsdkBuilder sfmc_build] error:&error];`,
       anchor:
-        /\[super application:application didFinishLaunchingWithOptions:launchOptions\];/,
+        /\[super application:application didFinishLaunchingWithOptions:launchOptions];/,
       offset: -1,
       tag: "@allboatsrise/expo-marketingcloudsdk(configuration)",
       comment: "//",
@@ -111,10 +110,7 @@ const withConfiguration: ConfigPlugin<MarketingCloudSdkPluginProps> = (
   });
 };
 
-const withPushConfiguration: ConfigPlugin<MarketingCloudSdkPluginProps> = (
-  config,
-  props
-) => {
+const withPushConfiguration: ConfigPlugin = (config) => {
   return withAppDelegate(config, async (config) => {
     config.modResults.contents = mergeContents({
       src: config.modResults.contents,
@@ -155,7 +151,7 @@ const withPushConfiguration: ConfigPlugin<MarketingCloudSdkPluginProps> = (
                      error);
     }`,
       anchor:
-        /\[super application:application didFinishLaunchingWithOptions:launchOptions\];/,
+        /\[super application:application didFinishLaunchingWithOptions:launchOptions];/,
       offset: 1,
       tag: "@allboatsrise/expo-marketingcloudsdk(push-configuration)",
       comment: "//",
@@ -165,10 +161,7 @@ const withPushConfiguration: ConfigPlugin<MarketingCloudSdkPluginProps> = (
   });
 };
 
-const withDelegateImplementation: ConfigPlugin<MarketingCloudSdkPluginProps> = (
-  config,
-  props
-) => {
+const withDelegateImplementation: ConfigPlugin = (config) => {
   return withAppDelegate(config, async (config) => {
     config.modResults.contents = mergeContents({
       src: config.modResults.contents,
@@ -226,9 +219,7 @@ const withDelegateImplementation: ConfigPlugin<MarketingCloudSdkPluginProps> = (
   });
 };
 
-const withMarketingCloudCocoaPods: ConfigPlugin<
-  MarketingCloudSdkPluginProps
-> = (config) => {
+const withMarketingCloudCocoaPods: ConfigPlugin = (config) => {
   return withDangerousMod(config, [
     "ios",
     async (config) => {
